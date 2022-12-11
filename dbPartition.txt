@@ -1,0 +1,27 @@
+Step 1: docker run --name cncdragneel -d -e POSTGRES_PASSWORD=postgres postgres
+
+Step 2: docker exec -it cncdragneel bash
+
+Step 3: psql -U postgres
+
+Step 4: create table emp_rating (id serial not null, r int not null);
+
+step 5: insert into emp_rating(r) select floor(random()*10) from generate_series (0,10000000);
+
+step 6: create index emp_rating_index on emp_rating(r);
+
+step 7: create table emp_rating_demo (id serial not null, r int not null) partition by range(r);
+
+step 8.1: create table r03 (like emp_rating_demo including indexes);
+step 8.2: create table r35 (like emp_rating_demo including indexes);
+step 8.3: create table r58 (like emp_rating_demo including indexes);
+step 8.4: create table r810 (like emp_rating_demo including indexes);
+
+step 9.1: alter table emp_rating_demo attach partition r03 for values from (0) to (3);
+step 9.2: alter table emp_rating_demo attach partition r35 for values from (3) to (5);
+step 9.3: alter table emp_rating_demo attach partition r58 for values from (5) to (8);
+step 9.4: alter table emp_rating_demo attach partition r810 for values from (8) to (10);
+
+step 10: insert into emp_rating_demo select * from emp_rating;
+
+step 11: create index emp_rating_demo_idx on emp_rating_demo(r);
